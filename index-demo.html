@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario Pensione Cani</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .app {
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 32px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+            font-size: 16px;
+        }
+
+        .date-input,
+        .number-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s ease;
+        }
+
+        .date-input:focus,
+        .number-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            accent-color: #3498db;
+        }
+
+        .total {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .total h2 {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .reset-button {
+            width: 100%;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .reset-button:hover {
+            background: #c0392b;
+        }
+
+        .reset-button:active {
+            transform: translateY(1px);
+        }
+
+        @media (max-width: 480px) {
+            .app {
+                padding: 12px;
+            }
+            
+            .container {
+                padding: 20px;
+                border-radius: 8px;
+            }
+            
+            .title {
+                font-size: 20px;
+                margin-bottom: 24px;
+            }
+            
+            .form-group {
+                margin-bottom: 16px;
+            }
+            
+            label {
+                font-size: 14px;
+            }
+            
+            .date-input,
+            .number-input {
+                padding: 10px 14px;
+                font-size: 14px;
+            }
+            
+            .checkbox-label {
+                font-size: 14px;
+            }
+            
+            .total {
+                padding: 16px;
+                margin: 20px 0;
+            }
+            
+            .total h2 {
+                font-size: 24px;
+            }
+            
+            .reset-button {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="container">
+            <h1 class="title">Calendario Pensione Cani</h1>
+            
+            <div class="form-group">
+                <label>Data di inizio (gg/mm):</label>
+                <input type="text" id="startDate" placeholder="gg/mm" class="date-input" />
+            </div>
+
+            <div class="form-group">
+                <label>Data di fine (gg/mm):</label>
+                <input type="text" id="endDate" placeholder="gg/mm" class="date-input" />
+            </div>
+
+            <div class="form-group">
+                <label>Numero di cani:</label>
+                <input type="number" id="numberOfDogs" min="1" value="2" class="number-input" />
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="heatedBox" />
+                    Box riscaldato (+5€/giorno)
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="swimmingPool" />
+                    Piscina (+25€ totale)
+                </label>
+            </div>
+
+            <div class="total" id="total" style="display: none;">
+                <h2>Totale: €<span id="totalAmount">0.00</span></h2>
+            </div>
+
+            <button onclick="reset()" class="reset-button">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        const tariffPeriods = [
+            { start: '15/01', end: '30/07', price: 20 },
+            { start: '01/08', end: '15/09', price: 25 },
+            { start: '16/09', end: '19/12', price: 20 },
+            { start: '20/12', end: '14/01', price: 25 },
+            { start: '24/12', end: '25/12', price: 100 },
+            { start: '31/12', end: '01/01', price: 100 }
+        ];
+
+        function parseDate(dateStr) {
+            const [day, month] = dateStr.split('/');
+            const year = new Date().getFullYear();
+            return new Date(year, parseInt(month) - 1, parseInt(day));
+        }
+
+        function formatDate(date) {
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            return `${day}/${month}`;
+        }
+
+        function getTariffForDate(date) {
+            const dateStr = formatDate(date);
+            
+            for (const period of tariffPeriods) {
+                let startDate = parseDate(period.start);
+                let endDate = parseDate(period.end);
+                
+                if (period.start === '20/12' || period.start === '31/12') {
+                    const currentYear = date.getFullYear();
+                    const startYear = currentYear;
+                    const endYear = period.end === '14/01' || period.end === '01/01' ? currentYear + 1 : currentYear;
+                    
+                    startDate.setFullYear(startYear);
+                    endDate.setFullYear(endYear);
+                }
+                
+                if (date >= startDate && date <= endDate) {
+                    return period.price;
+                }
+            }
+            
+            return 20;
+        }
+
+        function calculateTotal() {
+            const startDateStr = document.getElementById('startDate').value;
+            const endDateStr = document.getElementById('endDate').value;
+            const numberOfDogs = parseInt(document.getElementById('numberOfDogs').value) || 1;
+            const heatedBox = document.getElementById('heatedBox').checked;
+            const swimmingPool = document.getElementById('swimmingPool').checked;
+
+            if (!startDateStr || !endDateStr) return 0;
+
+            const startDate = parseDate(startDateStr);
+            const endDate = parseDate(endDateStr);
+
+            if (startDate > endDate) return 0;
+
+            const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+            let total = 0;
+
+            for (let i = 0; i < days; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                
+                let dailyPrice = getTariffForDate(currentDate);
+                
+                if (numberOfDogs > 1) {
+                    const firstDogPrice = dailyPrice;
+                    const additionalDogsPrice = (dailyPrice / 2) * (numberOfDogs - 1);
+                    dailyPrice = firstDogPrice + additionalDogsPrice;
+                }
+                
+                if (heatedBox) {
+                    dailyPrice += 5;
+                }
+                
+                total += dailyPrice;
+            }
+
+            if (swimmingPool) {
+                total += 25;
+            }
+
+            return total;
+        }
+
+        function updateTotal() {
+            const total = calculateTotal();
+            const totalElement = document.getElementById('total');
+            const totalAmountElement = document.getElementById('totalAmount');
+            
+            if (total > 0) {
+                totalElement.style.display = 'block';
+                totalAmountElement.textContent = total.toFixed(2);
+            } else {
+                totalElement.style.display = 'none';
+            }
+        }
+
+        function reset() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('numberOfDogs').value = '2';
+            document.getElementById('heatedBox').checked = false;
+            document.getElementById('swimmingPool').checked = false;
+            document.getElementById('total').style.display = 'none';
+        }
+
+        // Add event listeners
+        document.getElementById('startDate').addEventListener('input', updateTotal);
+        document.getElementById('endDate').addEventListener('input', updateTotal);
+        document.getElementById('numberOfDogs').addEventListener('input', updateTotal);
+        document.getElementById('heatedBox').addEventListener('change', updateTotal);
+        document.getElementById('swimmingPool').addEventListener('change', updateTotal);
+    </script>
+</body>
+</html>
