@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Calendar from "./components/Calendar";
+import { Dog, Flame, Waves, Minus, Plus, RefreshCw } from "lucide-react";
 import "./App.css";
 
 interface DateRange {
@@ -64,7 +65,24 @@ function App() {
   const handleDateChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
     setDateRange({ start, end });
+
+    if (start) {
+      const month = start.getMonth(); // 0-indexed
+      const isWinter = month >= 10 || month <= 2; // Nov (10) to Mar (2)
+      const isSummer = month >= 5 && month <= 7; // Jun (5) to Aug (7)
+
+      if (isWinter) setHeatedBox(true);
+      if (!isWinter) setHeatedBox(false);
+      if (isSummer) setSwimmingPool(true);
+      if (!isSummer) setSwimmingPool(false);
+    }
   };
+
+  const isPoolSeason = (() => {
+    if (!dateRange.start) return true;
+    const month = dateRange.start.getMonth();
+    return month >= 5 && month <= 7; // June 1st to August 31st
+  })();
 
   const { days, total } = (() => {
     if (!dateRange.start || !dateRange.end) return { days: 0, total: 0 };
@@ -74,7 +92,6 @@ function App() {
         (dateRange.end.getTime() - dateRange.start.getTime()) /
           (1000 * 60 * 60 * 24)
       ) + 1;
-    console.log(dayCount);
     let totalCost = 0;
 
     for (let i = 0; i < dayCount; i++) {
@@ -105,7 +122,7 @@ function App() {
 
   const reset = () => {
     setDateRange({ start: null, end: null });
-    setNumberOfDogs(1);
+    setNumberOfDogs(2);
     setHeatedBox(false);
     setSwimmingPool(false);
   };
@@ -113,65 +130,104 @@ function App() {
   return (
     <div className="app">
       <div className="container">
-        <h1 className="title">Calcola Preventivo</h1>
+        <header className="title-section">
+          <h1 className="title">Pensione Pancalieri</h1>
+        </header>
 
-        <div className="calendar-container">
+        <section className="card">
           <Calendar
             startDate={dateRange.start}
             endDate={dateRange.end}
             onChange={handleDateChange}
           />
-        </div>
+        </section>
 
-        <div className="form-group">
-          <label>Numero di cani:</label>
-          <input
-            type="number"
-            min="1"
-            value={numberOfDogs}
-            onChange={(e) => setNumberOfDogs(parseInt(e.target.value) || 2)}
-            className="number-input"
-          />
-        </div>
-
-        <div className="form-group">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={heatedBox}
-              onChange={(e) => setHeatedBox(e.target.checked)}
-            />
-            Box riscaldato (+5€/giorno)
-          </label>
-        </div>
-
-        <div className="form-group">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={swimmingPool}
-              onChange={(e) => setSwimmingPool(e.target.checked)}
-            />
-            Piscina (+25€ totale)
-          </label>
-        </div>
-
-        {days > 0 && (
-          <div className="summary">
-            <div className="summary-item">
-              <span>Numero di giorni</span>
-              <strong>{days}</strong>
+        <section className="form-section">
+          <div className="input-row">
+            <div className="input-label-with-icon">
+              <div className="icon-box">
+                <Dog size={20} />
+              </div>
+              <div className="label-text">
+                <span className="label-title">Numero di cani</span>
+                <span className="label-desc">Sconto dal secondo cane</span>
+              </div>
             </div>
-            <div className="summary-item total">
-              <span>Totale</span>
-              <strong>€{total.toFixed(2)}</strong>
+            <div className="stepper">
+              <button 
+                className="stepper-btn" 
+                onClick={() => setNumberOfDogs(Math.max(1, numberOfDogs - 1))}
+              >
+                <Minus size={16} />
+              </button>
+              <span className="stepper-value">{numberOfDogs}</span>
+              <button 
+                className="stepper-btn" 
+                onClick={() => setNumberOfDogs(numberOfDogs + 1)}
+              >
+                <Plus size={16} />
+              </button>
             </div>
           </div>
-        )}
 
-        <button onClick={reset} className="reset-button">
-          Reset
-        </button>
+          <div className="input-row">
+            <div className="input-label-with-icon">
+              <div className="icon-box">
+                <Flame size={20} />
+              </div>
+              <div className="label-text">
+                <span className="label-title">Box riscaldato</span>
+                <span className="label-desc">+5€ al giorno</span>
+              </div>
+            </div>
+            <label className="switch">
+              <input 
+                type="checkbox" 
+                checked={heatedBox}
+                onChange={(e) => setHeatedBox(e.target.checked)}
+              />
+              <span className="slider"></span>
+            </label>
+          </div>
+
+          <div className="input-row" style={{ opacity: isPoolSeason ? 1 : 0.6 }}>
+            <div className="input-label-with-icon">
+              <div className="icon-box">
+                <Waves size={20} />
+              </div>
+              <div className="label-text">
+                <span className="label-title">Piscina {!isPoolSeason && '(Chiusa)'}</span>
+                <span className="label-desc">+25€ una tantum</span>
+              </div>
+            </div>
+            <label className="switch">
+              <input 
+                type="checkbox" 
+                checked={swimmingPool}
+                disabled={!isPoolSeason}
+                onChange={(e) => setSwimmingPool(e.target.checked)}
+              />
+              <span className="slider"></span>
+            </label>
+          </div>
+        </section>
+
+        <div className="summary-card">
+          <div className="summary-details">
+            <div className="detail-item">
+              <span className="detail-label">Durata</span>
+              <span className="detail-value">{days} {days === 1 ? 'giorno' : 'giorni'}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Totale</span>
+              <span className="total-value">€{total.toFixed(2)}</span>
+            </div>
+          </div>
+          <button onClick={reset} className="reset-btn">
+            <RefreshCw size={16} style={{marginRight: '8px', verticalAlign: 'middle'}} />
+            Nuovo Calcolo
+          </button>
+        </div>
       </div>
     </div>
   );
