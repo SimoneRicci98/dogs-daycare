@@ -1,11 +1,9 @@
 import React from "react";
-import { Info } from "lucide-react";
 
 const PriceCard: React.FC = () => {
   return (
     <div className="price-card">
       <div className="price-card-header">
-        {/* <Info size={16} className="price-card-header-icon" /> */}
         <span>Listino prezzi e info</span>
       </div>
 
