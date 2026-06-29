@@ -26,7 +26,7 @@ const Calendar: React.FC<CalendarProps> = ({ startDate, endDate, onChange }) => 
         selectsRange
         inline
         locale="it"
-        minDate={new Date()}
+        //minDate={new Date()}
         shouldCloseOnSelect={false}
         disabledKeyboardNavigation
         renderCustomHeader={({
