@@ -1,6 +1,9 @@
 import { useState } from "react";
 import Calendar from "./components/Calendar";
-import { Dog, Flame, Waves, Minus, Plus, RefreshCw } from "lucide-react";
+import PriceCard from "./components/PriceCard";
+import OptionsCard from "./components/OptionsCard";
+import SummaryCard from "./components/SummaryCard";
+import { Info, CalendarDays } from "lucide-react";
 import "./App.css";
 
 interface DateRange {
@@ -22,6 +25,7 @@ function App() {
   const [numberOfDogs, setNumberOfDogs] = useState<number>(2);
   const [heatedBox, setHeatedBox] = useState<boolean>(false);
   const [swimmingPool, setSwimmingPool] = useState<boolean>(false);
+  const [showTariffs, setShowTariffs] = useState<boolean>(false);
 
   const tariffPeriods: TariffPeriod[] = [
     { start: "15/01", end: "30/07", price: 20 },
@@ -125,108 +129,70 @@ function App() {
     setNumberOfDogs(2);
     setHeatedBox(false);
     setSwimmingPool(false);
+    setShowTariffs(false);
   };
 
   return (
     <div className="app">
-      <div className="container">
+      <div className={`container ${showTariffs ? "prices-active" : ""}`}>
         <header className="title-section">
           <h1 className="title">Pensione Pancalieri</h1>
         </header>
 
-        <section className="card">
-          <Calendar
-            startDate={dateRange.start}
-            endDate={dateRange.end}
-            onChange={handleDateChange}
-          />
-        </section>
+        <div className={`app-grid ${showTariffs ? "prices-active" : ""}`}>
+          <div className={`flip-card-container ${showTariffs ? "flipped" : ""}`}>
+            <div className="flip-card-inner">
+              {/* Front: Calendar */}
+              <div className="flip-card-front card">
+                <button 
+                  type="button" 
+                  className="flip-btn" 
+                  onClick={() => setShowTariffs(true)}
+                  title="Mostra listino prezzi"
+                >
+                  <Info size={16} />
+                </button>
+                <Calendar
+                  startDate={dateRange.start}
+                  endDate={dateRange.end}
+                  onChange={handleDateChange}
+                />
+              </div>
 
-        <section className="form-section">
-          <div className="input-row">
-            <div className="input-label-with-icon">
-              <div className="icon-box">
-                <Dog size={20} />
+              {/* Back: Prices */}
+              <div className="flip-card-back card">
+                <button 
+                  type="button" 
+                  className="flip-btn" 
+                  onClick={() => setShowTariffs(false)}
+                  title="Torna al calendario"
+                >
+                  <CalendarDays size={16} />
+                </button>
+                <PriceCard />
               </div>
-              <div className="label-text">
-                <span className="label-title">Numero di cani</span>
-                <span className="label-desc">Sconto dal secondo cane</span>
-              </div>
-            </div>
-            <div className="stepper">
-              <button 
-                className="stepper-btn" 
-                onClick={() => setNumberOfDogs(Math.max(1, numberOfDogs - 1))}
-              >
-                <Minus size={16} />
-              </button>
-              <span className="stepper-value">{numberOfDogs}</span>
-              <button 
-                className="stepper-btn" 
-                onClick={() => setNumberOfDogs(numberOfDogs + 1)}
-              >
-                <Plus size={16} />
-              </button>
             </div>
           </div>
 
-          <div className="input-row">
-            <div className="input-label-with-icon">
-              <div className="icon-box">
-                <Flame size={20} />
-              </div>
-              <div className="label-text">
-                <span className="label-title">Box riscaldato</span>
-                <span className="label-desc">+5€ al giorno</span>
-              </div>
-            </div>
-            <label className="switch">
-              <input 
-                type="checkbox" 
-                checked={heatedBox}
-                onChange={(e) => setHeatedBox(e.target.checked)}
-              />
-              <span className="slider"></span>
-            </label>
+          <div className={`grid-item options-section ${showTariffs ? "hidden" : ""}`}>
+            <OptionsCard
+              numberOfDogs={numberOfDogs}
+              setNumberOfDogs={setNumberOfDogs}
+              heatedBox={heatedBox}
+              setHeatedBox={setHeatedBox}
+              swimmingPool={swimmingPool}
+              setSwimmingPool={setSwimmingPool}
+              isPoolSeason={isPoolSeason}
+            />
           </div>
 
-          <div className="input-row" style={{ opacity: isPoolSeason ? 1 : 0.6 }}>
-            <div className="input-label-with-icon">
-              <div className="icon-box">
-                <Waves size={20} />
-              </div>
-              <div className="label-text">
-                <span className="label-title">Piscina {!isPoolSeason && '(Chiusa)'}</span>
-                <span className="label-desc">+25€ una tantum</span>
-              </div>
-            </div>
-            <label className="switch">
-              <input 
-                type="checkbox" 
-                checked={swimmingPool}
-                disabled={!isPoolSeason}
-                onChange={(e) => setSwimmingPool(e.target.checked)}
-              />
-              <span className="slider"></span>
-            </label>
+          <div className={`grid-item summary-section ${showTariffs ? "hidden" : ""}`}>
+            <SummaryCard
+              days={days}
+              total={total}
+              reset={reset}
+            />
           </div>
-        </section>
-
-        <div className="summary-card">
-          <div className="summary-details">
-            <div className="detail-item">
-              <span className="detail-label">Durata</span>
-              <span className="detail-value">{days} {days === 1 ? 'giorno' : 'giorni'}</span>
-            </div>
-            <div className="detail-item">
-              <span className="detail-label">Totale</span>
-              <span className="total-value">€{total.toFixed(2)}</span>
-            </div>
-          </div>
-          <button onClick={reset} className="reset-btn">
-            <RefreshCw size={16} style={{marginRight: '8px', verticalAlign: 'middle'}} />
-            Nuovo Calcolo
-          </button>
         </div>
       </div>
     </div>

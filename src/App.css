@@ -374,3 +374,263 @@ input:checked + .slider:before {
     line-height: 28px !important;
   }
 }
+
+/* Responsive Grid Layout */
+.container {
+  transition: max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.container.prices-active {
+  max-width: 440px;
+}
+
+.app-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 840px;
+  }
+
+  .container.prices-active {
+    max-width: 440px;
+  }
+
+  .app-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .app-grid.prices-active {
+    grid-template-columns: 1fr;
+  }
+
+  .flip-card-container {
+    grid-row: span 2;
+  }
+
+  /* Ensure summary card expands when visible */
+  .summary-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* Ensure options section behaves correctly */
+  .options-section > .form-section {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0;
+  }
+  
+  .options-section > .form-section > .input-row {
+    flex: 1;
+    margin-bottom: 8px;
+  }
+  
+  .options-section > .form-section > .input-row:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* 3D Flip Card Container */
+.flip-card-container {
+  perspective: 1000px;
+  width: 100%;
+  height: 420px; /* matched heights */
+  transition: all 0.5s ease-in-out;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flip-card-container.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Front & Back Cards */
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+}
+
+.flip-card-front {
+  padding: 16px;
+}
+
+.flip-card-back {
+  padding: 16px;
+  transform: rotateY(180deg);
+}
+
+/* Make inner components within card layout properly */
+.flip-card-front > .custom-calendar-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Flip Button */
+.flip-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.flip-btn:hover {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.08);
+}
+
+/* Disappearing animation for Options and Summary sections */
+.grid-item.options-section,
+.grid-item.summary-section {
+  opacity: 1;
+  transform: scale(1);
+  max-height: 500px;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              margin 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.grid-item.options-section.hidden,
+.grid-item.summary-section.hidden {
+  opacity: 0;
+  transform: scale(0.9) translateY(15px);
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  pointer-events: none;
+}
+
+/* Price Card Component styles */
+.price-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+  text-align: left; /* reset from center-align of parent card */
+}
+
+.price-card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.price-card-header-icon {
+  color: var(--primary);
+}
+
+.prices-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.price-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.price-item:last-child {
+  border-bottom: none;
+}
+
+.price-item.special {
+  color: #b91c1c; /* a refined deep red instead of plain red */
+  font-weight: 600;
+}
+
+.price-item .period {
+  color: var(--text-main);
+}
+
+.price-item .price {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.price-item.special .price {
+  color: #b91c1c;
+}
+
+.extra-info-section {
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+.info-title {
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-list li {
+  line-height: 1.4;
+}
